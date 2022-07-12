@@ -1,1 +1,1 @@
-# wiki
+[Edit the WIKI](https://github.com/toastmasters-nz-wellington-club/wiki/wiki)
