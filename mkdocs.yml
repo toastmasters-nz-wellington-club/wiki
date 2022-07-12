@@ -1,0 +1,31 @@
+site_name: Wellington Club Wiki
+# repo_url: https://github.com/toastmasters-nz-wellington-club/org
+
+docs_dir: 'wiki'
+
+plugins:
+  - search
+  - section-index
+  - gen-files:
+      scripts:
+        - extras/gen_next_meeting_agenda_redirect.py
+  - literate-nav:
+      nav_file: NAVIGATION.md
+  - redirects:
+      redirect_maps:
+        'index.md': 'Home.md'
+  - minify:
+      minify_html: true
+      minify_js: true
+      minify_css: true
+      htmlmin_opts:
+          remove_comments: true
+
+theme:
+  name: material
+
+extra:
+  generator: false
+  analytics:
+      provider: google
+      property: G-1YPS8VY2K9

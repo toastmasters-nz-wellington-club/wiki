@@ -1,0 +1,81 @@
+jobs:
+  main:
+    name: 'Publish the Wiki'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/checkout@v3
+        with:
+          repository: '${{ github.repository }}.wiki'
+          path: wiki
+
+      - name: Define the version
+        id: version
+        run: |
+          VERSION=$(date +%Y%m%d%H%M%S)
+          echo "##[set-output name=version;]$VERSION"
+
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      - name: Install mkdocs
+        run: |
+          mkdir python-mkdocs-venv;
+          python -m venv python-mkdocs-venv;
+          source python-mkdocs-venv/bin/activate;
+          pip install -U mkdocs;
+          pip install -U mkdocs-material;
+          pip install -U mkdocs-section-index;
+          pip install -U mkdocs-literate-nav;
+          pip install -U mkdocs-minify-plugin;
+          pip install -U mkdocs-redirects
+          pip install -U mkdocs-gen-files
+
+      - name: Build the documentation
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          source python-mkdocs-venv/bin/activate;
+
+          mkdocs build -d ../release;
+
+      - name: Create Release
+        id: create-release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.version.outputs.version }}
+          release_name: Release ${{ steps.version.outputs.version }}
+
+      - name: Package the release
+        id: package-the-release
+        run: |
+          cd ../release
+          zip -9 -r "wiki-site-build-${{ steps.version.outputs.version }}.zip" .
+
+      - name: Upload the release
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: "${{ steps.create-release.outputs.upload_url }}"
+          asset_path: "../release/wiki-site-build-${{ steps.version.outputs.version }}.zip"
+          asset_name: "wiki-site-build-${{ steps.version.outputs.version }}.zip"
+          asset_content_type: application/zip
+
+      - name: Push site to toastmasters-nz-wellington-club.github.io
+        env:
+          CUST_GITHUB_API_TOKEN: ${{ secrets.CUST_GITHUB_API_TOKEN }}
+        run: |
+          cd ../release
+          rm -f wiki-site-build-*.zip
+          touch .nojekyll
+          git config --global user.name "GitHub Action"
+          git init -b site/release/${{ steps.version.outputs.version }}
+          git add .
+          git commit -m 'Release ${{ steps.version.outputs.version }}';
+          git remote add main "https://$CUST_GITHUB_API_TOKEN@github.com/toastmasters-nz-wellington-club/toastmasters-nz-wellington-club.github.io.git"
+          git push main site/release/${{ steps.version.outputs.version }}:main

@@ -1,0 +1,29 @@
+<!--
+    The purpose of this HTML document is to redirect user to the Printable Agenda of the next meeting in EasySpeak.
+
+    We probe EasySpeak via iframe to let the agent (browser)
+    redirect to the club next meeting agenda page.
+    Then we take the URL after the redirect, slightly modify it to be
+    the "print" version of the agenda, and then we redirect the agent (browser)
+    to the printable version of the next club meeting agenda.
+-->
+<html>
+    <head>
+        <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+        <script>
+            function redirect() {
+                const ifr = document.getElementById('fenestro');
+                const viewMeetingUrl = ifr.attributes['src'].nodeValue;
+                const printableAgendaUrl = viewMeetingUrl.replace('view_agenda.php', 'viewagenda.php') + '&pr=1';
+
+                // redirecting
+                location.href = printableAgendaUrl;
+            }
+        </script>
+    </head>
+    <body>
+        EasySpeak is loading, please wait ... 
+        <iframe id="fenestro" src="https://easy-speak.org/view_meeting.php?c=6788" onload="redirect()" loading="eager" width="1" height="1" style="display: none;">
+        </iframe>
+    </body>
+</html>
