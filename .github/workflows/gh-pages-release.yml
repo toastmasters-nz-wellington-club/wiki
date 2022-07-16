@@ -83,4 +83,4 @@ jobs:
           git add .
           git commit -m 'Release ${{ steps.version.outputs.version }}';
           git remote add site "https://$PUBLISH_WIKI_SITE_GITHUB_TOKEN@github.com/toastmasters-nz-wellington-club/toastmasters-nz-wellington-club.github.io.git"
-          git push site site/release/${{ steps.version.outputs.version }}:main
+          git push site site/release/${{ steps.version.outputs.version }}:main -f
