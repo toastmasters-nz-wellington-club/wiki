@@ -73,7 +73,7 @@ jobs:
 
       - name: Push site to toastmasters-nz-wellington-club.github.io
         env:
-          CUST_GITHUB_API_TOKEN: ${{ secrets.CUST_GITHUB_API_TOKEN }}
+          PUBLISH_WIKI_SITE_GITHUB_TOKEN: ${{ secrets.PUBLISH_WIKI_SITE_GITHUB_TOKEN }}
         run: |
           cd ../release
           rm -f wiki-site-build-*.zip
@@ -82,5 +82,5 @@ jobs:
           git init -b site/release/${{ steps.version.outputs.version }}
           git add .
           git commit -m 'Release ${{ steps.version.outputs.version }}';
-          git remote add main "https://$CUST_GITHUB_API_TOKEN@github.com/toastmasters-nz-wellington-club/toastmasters-nz-wellington-club.github.io.git"
-          git push main site/release/${{ steps.version.outputs.version }}:main
+          git remote add site "https://$PUBLISH_WIKI_SITE_GITHUB_TOKEN@github.com/toastmasters-nz-wellington-club/toastmasters-nz-wellington-club.github.io.git"
+          git push site site/release/${{ steps.version.outputs.version }}:main
